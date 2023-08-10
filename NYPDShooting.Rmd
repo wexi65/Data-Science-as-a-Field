@@ -18,7 +18,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r NYPDShooting, echo = FALSE}
+```{r NYPDShooting}
 url_in <- "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv"
 NYPDShooting <- read_csv(url_in)
 shooting <- NYPDShooting %>%
@@ -27,14 +27,14 @@ shooting <- NYPDShooting %>%
 summary(shooting)
 ```
 
-```{r Replace NA with UNKNOWN, echo = FALSE}
+```{r Replace NA with UNKNOWN}
 shooting$PERP_AGE_GROUP <- shooting$PERP_AGE_GROUP %>% replace_na("UNKNOWN")
 shooting$PERP_SEX <- shooting$PERP_SEX %>% replace_na("U")
 shooting$PERP_RACE <- shooting$PERP_RACE %>% replace_na("UNKNOWN")
 ```
 Since there are missing data for the perpetrators, so I just replace them with unknown.
 
-```{r processing, echo = FALSE}
+```{r processing}
 shooting_by_month_year <- shooting %>%
   group_by(PRECINCT, BORO, OCCUR_DATE) %>%
   summarize(INCIDENTS = n(), MONTH_YEAR = as.yearmon(paste(month(OCCUR_DATE, label = TRUE), year(OCCUR_DATE)))) %>%
@@ -54,7 +54,7 @@ shooting_by_boro <- shooting_by_precinct %>%
   ungroup()
 ```
 
-```{r visualizing and analyzing shooting in NY, echo = FALSE}
+```{r visualizing and analyzing shooting in NY}
 shooting_year_total <- shooting_by_boro %>%
   group_by(MONTH_YEAR) %>%
   summarize(INCIDENTS = sum(INCIDENTS)) %>%
@@ -73,7 +73,7 @@ shooting_year_total %>%
 
 This plot illustrates shooting incidents across the entirety of New York. It demonstrates an initial gradual decline trend until around January 2020, followed by a sharp and significant upward trend thereafter.
 
-```{r visualizing and analyzing shooting in Queens, echo = FALSE}
+```{r visualizing and analyzing shooting in Queens}
 shooting_queens_year_total <- shooting_by_boro %>%
   filter(BORO == "QUEENS") %>%
   group_by(MONTH_YEAR) %>%
@@ -91,7 +91,7 @@ shooting_queens_year_total %>%
 
 This plot depicts shooting incidents specifically within the Queens borough. It showcases a comparable trend to that of the entire New York, characterized by a decrease preceding January 2020, followed by a subsequent increase.
 
-```{r visualizing and analyzing shooting in Manhattan, echo = FALSE}
+```{r visualizing and analyzing shooting in Manhattan}
 shooting_manhattan_year_total <- shooting_by_boro %>%
   filter(BORO == "MANHATTAN") %>%
   group_by(MONTH_YEAR) %>%
@@ -109,7 +109,7 @@ shooting_manhattan_year_total %>%
 
 This plot visualizes shooting incidents within the Manhattan borough. Its trend closely mirrors that of the Queens borough. However, the accompanying summary reveals a difference in incident count, indicating fewer occurrences in comparison to Queens.
 
-```{r modeling, echo = FALSE}
+```{r modeling}
 mod <- lm(INCIDENTS ~ MONTH_YEAR, data = shooting_year_total)
 x_grid <- seq(as.yearmon("JAN 2006"), as.yearmon("DEC 2023"))
 new_df <- tibble(MONTH_YEAR = x_grid)
